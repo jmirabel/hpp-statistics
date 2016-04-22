@@ -1,34 +1,35 @@
 language: cpp
 sudo: required
+os:
+  - linux
+  - osx
 dist: trusty
+addons:
+  apt:
+    packages: # Update dependencies on linux if in travis apt whitelist
+      - libboost-test-dev
+      - libboost-system-dev
+      - libboost-thread-dev
+      - libboost-filesystem-dev
+      - libboost-program-options-dev
+      - libtinyxml-dev
 branches:
   only:
   - master
   - devel
 compiler:
-- gcc
-addons:
-  apt:
-    packages:
-      - g++
-      - cmake
-      - libboost-dev
-      - libboost-filesystem-dev
-      - libboost-system-dev
-      - git
-      - flex
-      - bison
-      - asciidoc
-      - autoconf
-      - source-highlight
-      - doxygen
-      - libtinyxml-dev
-      - libltdl-dev
-      - liblog4cxx10-dev
-      - python2.7-dev
-      - doxygen-latex
+  - gcc
 before_install:
-- git submodule update --init --recursive
+  - git submodule --quiet update --init
+  - export ROOT_DIR=`pwd`
+  - export DEVEL_DIR="$ROOT_DIR/_travis"
+  - export TRAVIS_SUBMODULE="$ROOT_DIR/.travis-submodule"
 
-script: ./.travis/build
-# after_script: ./.travis/run
+  - export APT_PACKAGES=""
+  - export BREW_PACKAGES=""
+
+  - export EXTERNAL_DEPENDENCIES="doxygen"
+  - export HPP_DEPENDENCIES="hpp-util"
+install: ${TRAVIS_SUBMODULE}/install
+script: ${TRAVIS_SUBMODULE}/script
+after_failure: ${TRAVIS_SUBMODULE}/after_failure
